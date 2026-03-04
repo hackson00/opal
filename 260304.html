@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI농부(핵손팜) - 딸기 자동화 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        berry: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                        },
+                        smartgreen: {
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        },
+                        dark: '#0f172a',
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .dark-glass {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(circle at 0% 0%, #fff1f2 0%, transparent 50%),
+                              radial-gradient(circle at 100% 100%, #f0fdf4 0%, transparent 50%);
+        }
+        .bento-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .bento-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="font-sans text-slate-900 overflow-x-hidden">
+
+    <!-- Header Section -->
+    <header class="relative pt-12 pb-8 px-6 text-center">
+        <div class="max-w-4xl mx-auto">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-berry-100 text-berry-700 font-bold text-sm mb-4 animate-pulse-slow">
+                <span class="w-2 h-2 rounded-full bg-berry-600"></span>
+                LIVE Smart Farming System
+            </div>
+            <h1 class="text-4xl md:text-6xl font-display font-extrabold tracking-tight mb-2">
+                AI농부 <span class="gradient-text">(핵손팜)</span>
+            </h1>
+            <p class="text-xl md:text-2xl font-bold text-slate-600">딸기 자동화 시스템 통합 관제</p>
+            <p class="mt-4 text-slate-500 font-medium">2026년 3월 2일 월요일</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        
+        <!-- Dashboard Summary Grid (Bento) -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <!-- Weather Data Card -->
+            <div class="md:col-span-2 glass-card rounded-3xl p-8 bento-item overflow-hidden relative">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-400 uppercase tracking-widest">Weather Station</h2>
+                        <p class="text-3xl font-black mt-1">전남 보성군 득량면</p>
+                    </div>
+                    <div class="bg-blue-500 text-white p-3 rounded-2xl shadow-lg animate-float">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.242 17.657l.707.707M6.343 6.343l.707-.707m12.728 0l-.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/50 rounded-2xl p-4">
+                        <span class="text-sm text-slate-500 block">현재 기온</span>
+                        <span class="text-4xl font-display font-bold text-slate-800">13.8°C</span>
+                    </div>
+                    <div class="bg-white/50 rounded-2xl p-4">
+                        <span class="text-sm text-slate-500 block">오늘 최고</span>
+                        <span class="text-4xl font-display font-bold text-berry-600">14.0°C</span>
+                    </div>
+                </div>
+                <div class="mt-6 flex gap-4 text-sm font-semibold text-slate-600">
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-400"></span> 일출 06:56</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-400"></span> 일몰 18:28</span>
+                </div>
+            </div>
+
+            <!-- Nutrients Card -->
+            <div class="glass-card rounded-3xl p-8 bento-item border-l-4 border-l-green-500">
+                <h2 class="text-lg font-bold text-slate-400 uppercase tracking-widest mb-4 text-center">급액 설정</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                        <span class="font-bold">pH</span>
+                        <span class="text-xl font-display font-bold text-green-600">5.8 ~ 6.0</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                        <span class="font-bold">EC</span>
+                        <span class="text-xl font-display font-bold text-green-600">0.7 ~ 0.9</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold">급액량</span>
+                        <span class="text-xl font-display font-bold text-green-600">400ml</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Humidity/Temp Alert Card -->
+            <div class="dark-glass rounded-3xl p-8 bento-item text-white border-l-4 border-l-berry-500">
+                <h2 class="text-lg font-bold text-slate-400 uppercase tracking-widest mb-4">중점 관리</h2>
+                <div class="flex flex-col h-full justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                            <span class="text-xl font-bold">일교차 주의</span>
+                        </div>
+                        <p class="text-slate-400 text-sm">현재 일교차 13°C로 매우 큼. 야간 다습 배출 및 오전 강제 환기 필수.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/10">
+                        <div class="flex justify-between text-xs text-slate-400">
+                            <span>습도 85% 고습 위험</span>
+                            <span>회색곰팡이병 경보</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Media Gallery -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+            <div class="rounded-2xl overflow-hidden shadow-xl aspect-square glass-card p-2">
+                <div class="w-full h-full rounded-xl overflow-hidden flex items-center justify-center bg-slate-100">
+                    <img src='https://opal.google/board/blobs/4571d80e-ae02-4a64-9c11-5934719cded6' alt='작물 상태 1' class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                </div>
+            </div>
+            <div class="rounded-2xl overflow-hidden shadow-xl aspect-square glass-card p-2">
+                <div class="w-full h-full rounded-xl overflow-hidden flex items-center justify-center bg-slate-100">
+                    <img src='https://opal.google/board/blobs/f0573509-c87d-4724-9a19-c2454d5f2974' alt='시설 현황 2' class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                </div>
+            </div>
+            <div class="rounded-2xl overflow-hidden shadow-xl aspect-square glass-card p-2">
+                <div class="w-full h-full rounded-xl overflow-hidden flex items-center justify-center bg-slate-100">
+                    <img src='https://opal.google/board/blobs/5ff13ea3-57ab-485b-aa05-bf3e2f63ace9' alt='병해충 예찰 3' class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                </div>
+            </div>
+            <div class="rounded-2xl overflow-hidden shadow-xl aspect-square glass-card p-2">
+                <div class="w-full h-full rounded-xl overflow-hidden flex items-center justify-center bg-slate-100">
+                    <img src='https://opal.google/board/blobs/4b9fad5f-17ef-4f50-8ec4-71a79c4cb263' alt='생육 관리 4' class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Management Points Section -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Point 1 -->
+                <section class="glass-card rounded-[2.5rem] p-8 shadow-sm">
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="w-12 h-12 rounded-2xl bg-berry-600 flex items-center justify-center text-white shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                        <h2 class="text-2xl font-black text-slate-800">오늘의 영농 관리 포인트</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-6 rounded-3xl bg-white border border-slate-100 hover:border-berry-200 transition-colors">
+                            <h3 class="font-bold text-berry-600 mb-2 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-berry-600"></span>환기 및 온·습도
+                            </h3>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li>• 오전 8:00 이전 강제 환기 (회색곰팡이병 예방)</li>
+                                <li>• 낮 25~27°C / 야간 8~10°C 목표 설정</li>
+                                <li>• 하우스 중앙부 유동팬 24시간 풀 가동</li>
+                            </ul>
+                        </div>
+                        <div class="p-6 rounded-3xl bg-white border border-slate-100 hover:border-berry-200 transition-colors">
+                            <h3 class="font-bold text-berry-600 mb-2 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-berry-600"></span>관수 및 양액
+                            </h3>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li>• 일조량 증가에 맞춰 일 6~8회 증량 공급</li>
+                                <li>• EC 1.1~1.3mS/cm 유지 (배액률 20~30%)</li>
+                                <li>• 피크기 염류 집적 방지 모니터링 강화</li>
+                            </ul>
+                        </div>
+                        <div class="p-6 rounded-3xl bg-white border border-slate-100 hover:border-berry-200 transition-colors">
+                            <h3 class="font-bold text-berry-600 mb-2 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-berry-600"></span>수확 및 생육
+                            </h3>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li>• 착색 80~90% 수준 조기 수확 및 즉시 예냉</li>
+                                <li>• 3~4화방 적심·적화 및 노화엽 제거</li>
+                                <li>• 벌통 주변 수분 공급 및 활동량 점검</li>
+                            </ul>
+                        </div>
+                        <div class="p-6 rounded-3xl bg-white border border-slate-100 hover:border-berry-200 transition-colors">
+                            <h3 class="font-bold text-berry-600 mb-2 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-berry-600"></span>병해충 예찰
+                            </h3>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li>• 잎 뒷면 응애, 진딧물, 총채벌레 정밀 예찰</li>
+                                <li>• 흰가루병(건조 시) 예방적 약제 살포 검토</li>
+                                <li>• 시설 내 급격한 습도 변화 억제 조치</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Detailed Environmental Instruction -->
+                <section class="glass-card rounded-[2.5rem] p-8 shadow-sm">
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                        <h2 class="text-2xl font-black text-slate-800">시설 및 기상 대응 세부 지침</h2>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-1 bg-slate-50 p-6 rounded-3xl">
+                                <h3 class="font-bold mb-3 text-indigo-700">3연동 하우스 특화 관리</h3>
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    구조상 공기 흐름이 정체되는 <strong>중앙 구역에 유동팬 배치를 집중</strong>하고, 수직 유동팬(제트팬)을 가동하여 상하 온도 편차를 해소하십시오. 측창 주변(저온)과 중앙부(고온)의 개폐기 열림 정도를 차등 제어해야 합니다.
+                                </p>
+                            </div>
+                            <div class="flex-1 bg-slate-50 p-6 rounded-3xl">
+                                <h3 class="font-bold mb-3 text-indigo-700">보온 및 차광막 운용</h3>
+                                <p class="text-sm text-slate-600 leading-relaxed">
+                                    일출 후 30분~1시간 내 개방하여 광합성을 촉진하고, <strong>강한 직사광선 발생 시(11시~14시) 차광망을 30% 내외로 전개</strong>하여 잎의 온도 급상승을 방지하십시오.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100">
+                            <h3 class="font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                                </svg>
+                                상황별 대처 매뉴얼
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-2xl shadow-sm">
+                                    <span class="text-xs font-bold text-blue-600 block mb-1">다습 시 (오전 85%↑)</span>
+                                    <p class="text-xs text-slate-500">배기팬 강제 환기 + 난방기 활용 '결로 방지 관리' 병행</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-2xl shadow-sm">
+                                    <span class="text-xs font-bold text-orange-600 block mb-1">건조 시 (오후 40%↓)</span>
+                                    <p class="text-xs text-slate-500">통로 살수 + 풍상측(서풍) 창 좁게 조절하여 급격한 유입 차단</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Timeline & Market -->
+            <div class="space-y-8">
+                <!-- Time-based Plan -->
+                <section class="dark-glass rounded-[2.5rem] p-8 text-white shadow-2xl">
+                    <h2 class="text-xl font-black mb-6 border-b border-white/10 pb-4">시간대별 작업 계획</h2>
+                    <div class="space-y-6 relative">
+                        <div class="absolute left-3 top-2 bottom-2 w-px bg-white/20"></div>
+                        
+                        <div class="relative pl-10">
+                            <span class="absolute left-0 top-1 w-6 h-6 rounded-full bg-berry-500 border-4 border-slate-900"></span>
+                            <div class="font-bold text-berry-400">07:00 ~ 09:00</div>
+                            <div class="text-sm font-medium">강제 환기 및 가온</div>
+                            <div class="text-xs text-slate-400">야간 다습 배출, 곰팡이병 예방</div>
+                        </div>
+
+                        <div class="relative pl-10">
+                            <span class="absolute left-0 top-1 w-6 h-6 rounded-full bg-orange-400 border-4 border-slate-900"></span>
+                            <div class="font-bold text-orange-400">09:00 ~ 15:00</div>
+                            <div class="text-sm font-medium">온도 제어 및 환기</div>
+                            <div class="text-xs text-slate-400">25~27°C 유지, 28°C 초과 금지</div>
+                        </div>
+
+                        <div class="relative pl-10">
+                            <span class="absolute left-0 top-1 w-6 h-6 rounded-full bg-blue-400 border-4 border-slate-900"></span>
+                            <div class="font-bold text-blue-400">15:00 ~ 18:00</div>
+                            <div class="text-sm font-medium">마무리 및 보온</div>
+                            <div class="text-xs text-slate-400">측창 밀폐, 야간 8~10°C 확보</div>
+                        </div>
+
+                        <div class="relative pl-10">
+                            <span class="absolute left-0 top-1 w-6 h-6 rounded-full bg-green-400 border-4 border-slate-900 shadow-[0_0_10px_rgba(74,222,128,0.5)]"></span>
+                            <div class="font-bold text-green-400">24 HOURS</div>
+                            <div class="text-sm font-medium">유동팬 상시 가동</div>
+                            <div class="text-xs text-slate-400">중앙부 정체 해소 필쑤</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Market Price Data -->
+                <section class="glass-card rounded-[2.5rem] p-8">
+                    <h2 class="text-xl font-black text-slate-800 mb-6 flex items-center justify-between">
+                        딸기(설향) 경매 현황
+                        <span class="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded">2026-03-02</span>
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-sm">서울/구리 (구리농협)</span>
+                                <span class="text-xs bg-berry-50 text-berry-600 px-2 py-0.5 rounded-full font-bold">1kg 특</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-2xl font-black text-slate-800">12,500원</span>
+                                <span class="text-xs text-slate-400">평균가</span>
+                            </div>
+                            <div class="mt-1 text-[10px] text-slate-400">범위: 11,000 ~ 14,500원</div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-sm">전남/순천 (원예농협)</span>
+                                <span class="text-xs bg-berry-50 text-berry-600 px-2 py-0.5 rounded-full font-bold">1kg 특</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-2xl font-black text-slate-800">10,800원</span>
+                                <span class="text-xs text-slate-400">평균가</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-slate-100">
+                            <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-berry-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
+                                </svg>
+                                내일 가격 예측 (03-03)
+                            </h3>
+                            <div class="p-4 rounded-2xl bg-berry-50 border border-berry-100">
+                                <div class="flex justify-between items-center text-sm mb-1">
+                                    <span class="font-bold text-berry-900">구리농협</span>
+                                    <span class="text-berry-600 font-bold">▼ 소폭 하락</span>
+                                </div>
+                                <div class="text-lg font-black text-berry-800">12,000 ~ 13,500원</div>
+                                <p class="text-[10px] text-berry-700 mt-2">주초 물량 집중 이후 반입량 안정화 및 소비 분산 예상</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Analysis Box -->
+        <section class="mt-12 glass-card rounded-[2.5rem] p-8 border-l-8 border-l-smartgreen-500">
+            <h2 class="text-2xl font-black text-slate-800 mb-4">종합 분석 및 영농 전략</h2>
+            <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed">
+                <p>
+                    3월 초순은 딸기 출하량이 본격적으로 증가하며 품질에 따른 가격 편차가 심해지는 시기입니다. 
+                    현재 구리 시장의 2kg 특 규격은 20,000원 선을 유지하고 있으나, 내일은 전반적인 출하량 증가로 인해 약 3~5% 내외의 가격 조정이 예상됩니다.
+                </p>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><strong>수확 전략:</strong> 기온 상승에 따른 과실 연화 방지를 위해 80-90% 착색 시 조기 수확.</li>
+                        <li><strong>환경 전략:</strong> 일교차 13°C 대응을 위한 오후 보온커튼 조기 작동(기초 온도 확보).</li>
+                    </ul>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><strong>양액 전략:</strong> 현재 낮은 EC(0.7-0.9)를 유지 중이나 배액 EC 모니터링 후 1.1 이상 상향 검토.</li>
+                        <li><strong>매수/매도:</strong> 내일 오전 경매 이후 출하 물량 흐름 확인 후 시장 대응 유리.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Simple interactive micro-animations
+        document.querySelectorAll('.bento-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.borderColor = 'rgba(244, 63, 94, 0.3)';
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            });
+        });
+    </script>
+</body>
+</html>
