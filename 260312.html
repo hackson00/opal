@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI농부(핵손팜) - 딸기 자동화 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        strawberry: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            900: '#881337',
+                        },
+                        farm: {
+                            dark: '#0f172a',
+                            glass: 'rgba(255, 255, 255, 0.08)',
+                            card: 'rgba(15, 23, 42, 0.6)',
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Outfit', 'Noto Sans KR', 'sans-serif'],
+                        body: ['Noto Sans KR', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .strawberry-gradient {
+            background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .glow-red {
+            box-shadow: 0 0 20px rgba(225, 29, 72, 0.3);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-body">
+
+    <!-- Header Section -->
+    <header class="relative pt-12 pb-20 px-6 text-center overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-20 pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-strawberry-600 blur-[120px] rounded-full"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600 blur-[120px] rounded-full"></div>
+        </div>
+        
+        <div class="relative z-10 flex flex-col items-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-morphism mb-6 animate-pulse-slow">
+                <span class="w-2 h-2 rounded-full bg-strawberry-500"></span>
+                <span class="text-xs font-semibold tracking-wider text-strawberry-200">AI SMART FARMING SYSTEM</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-display font-bold mb-4 tracking-tight">
+                AI농부 <span class="text-strawberry-500">(핵손팜)</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-400 font-light max-w-2xl mx-auto">
+                딸기 자동화 시스템 대시보드
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 pb-24 space-y-12">
+
+        <!-- Top Status & Hero Image -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-8 group overflow-hidden rounded-3xl glow-red">
+                <div class="relative aspect-video">
+                    <img src='https://opal.google/board/blobs/5e51607f-5077-4024-84b3-fe5105f90d70' alt='AI Strawberry System Main' class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-farm-dark via-transparent to-transparent opacity-60"></div>
+                    <div class="absolute bottom-6 left-6">
+                        <h2 class="text-2xl font-bold">생육 분석 메인 모니터링</h2>
+                        <p class="text-slate-300">2026.03.11 실시간 현장 데이터 수집 중</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-4 grid grid-cols-1 gap-4">
+                <div class="glass-morphism p-6 rounded-3xl">
+                    <h3 class="text-sm font-semibold text-slate-400 mb-4 uppercase tracking-widest">실시간 기상 현황 (17:11)</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end">
+                            <span class="text-4xl font-display font-bold">12.8℃</span>
+                            <span class="text-strawberry-400 text-sm">최고 14.8℃</span>
+                        </div>
+                        <div class="h-[1px] bg-slate-700 w-full"></div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">날씨 구분</span>
+                            <span class="font-medium">대체로 맑음 (건조)</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">일출/일몰</span>
+                            <span class="font-medium">06:46 / 18:37</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-strawberry-600 p-6 rounded-3xl relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 opacity-20 transform group-hover:scale-110 transition-transform">
+                        <svg width="120" height="120" viewBox="0 0 24 24" fill="white"><path d="M12 2C11.38 2 10.74 2.15 10.15 2.47L4.15 5.47C2.82 6.13 2 7.5 2 9V15C2 16.5 2.82 17.87 4.15 18.53L10.15 21.53C10.74 21.85 11.38 22 12 22S13.26 21.85 13.85 21.53L19.85 18.53C21.18 17.87 22 16.5 22 15V9C22 7.5 21.18 6.13 19.85 5.47L13.85 2.47C13.26 2.15 12.62 2 12 2M12 4.13L18 7.13V10.13L12 7.13L6 10.13V7.13L12 4.13M6 12.13L12 9.13L18 12.13V15.13L12 18.13L6 15.13V12.13Z"/></svg>
+                    </div>
+                    <h3 class="text-white/80 text-sm font-semibold mb-1">농장 정보</h3>
+                    <p class="text-xl font-bold leading-tight">해오름딸기영농조합법인</p>
+                    <p class="text-sm text-white/70 mt-1">전남 보성군 득량면</p>
+                    <div class="mt-4 inline-block bg-white/20 px-3 py-1 rounded text-xs">설향 / 1,200평</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bento Grid Management Points -->
+        <section>
+            <div class="flex items-end justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold font-display">오늘의 핵심 관리 포인트</h2>
+                    <p class="text-slate-400">2026년 3월 11일(수) 핵심 가이드라인</p>
+                </div>
+                <div class="hidden md:block h-[1px] flex-1 bg-slate-800 mx-8"></div>
+                <div class="status-badge bg-strawberry-500/20 text-strawberry-400 border border-strawberry-500/30">CRITICAL CARE</div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Point 1 -->
+                <div class="glass-morphism p-8 rounded-[2rem] hover:bg-white/5 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-500/20 flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 0A9 9 0 115.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">환기 및 야간 변온</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        오전 중 25℃ 도달 전 단계적 환기 실시. 야간 온도는 8~10℃ 이상 유지하여 과실 비대를 촉진해야 합니다.
+                    </p>
+                </div>
+                <!-- Point 2 -->
+                <div class="glass-morphism p-8 rounded-[2rem] hover:bg-white/5 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">급액 및 함수율</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        일조량 증가에 맞춰 공급 EC 1.1~1.3, pH 5.8~6.2 유지. 일몰 2~3시간 전 급액을 마무리하여 과습을 방지하십시오.
+                    </p>
+                </div>
+                <!-- Point 3 -->
+                <div class="glass-morphism p-8 rounded-[2rem] hover:bg-white/5 transition-all">
+                    <div class="w-12 h-12 rounded-2xl bg-strawberry-500/20 flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-strawberry-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">수확 및 예냉</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        기온 상승 시 착색 80~90% 단계에서 조기 수확. 수확 직후 반드시 예냉 처리를 통해 품질을 유지하십시오.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visual Media Gallery -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="aspect-square rounded-3xl overflow-hidden glass-morphism">
+                <img src='https://opal.google/board/blobs/2da277fd-7793-4296-ac4c-d225a6ee9183' alt='strawberry_2' class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+            </div>
+            <div class="aspect-square rounded-3xl overflow-hidden glass-morphism">
+                <img src='https://opal.google/board/blobs/9fc5d0ec-f290-4d26-97a5-45f824eb329c' alt='strawberry_3' class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+            </div>
+            <div class="aspect-square rounded-3xl overflow-hidden glass-morphism">
+                <img src='https://opal.google/board/blobs/2e3fbcb4-47e9-4dbc-9022-f4a83232b5d7' alt='strawberry_4' class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+            </div>
+            <div class="aspect-square rounded-3xl overflow-hidden glass-morphism">
+                <img src='https://opal.google/board/blobs/cbd01b60-3d2a-463d-b847-4ebc3f1f9d4b' alt='strawberry_5' class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+            </div>
+        </section>
+
+        <!-- Detailed Monitoring Tabs Style -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 py-12">
+            <!-- Left Column: Environment Config -->
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 border-b-2 border-strawberry-500 pb-2">
+                    <h3 class="text-2xl font-bold">환경 관리 정밀 지침</h3>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-1 bg-strawberry-500 rounded-full"></div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white mb-2">천·측창 환기 제어</h4>
+                            <p class="text-slate-400 text-sm">오전 09:30~10:00(22℃ 도달 시) 단계적 개방. 25℃ 초과 금지. 오후 16:30~17:30(18~20℃) 폐쇄.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-1 bg-strawberry-300 rounded-full"></div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white mb-2">보온커튼/차광망</h4>
+                            <p class="text-slate-400 text-sm">일출 1시간 후 개방(냉기 쇼크 주의). 12:00~14:00 사이 27℃ 이상 시 30~50% 차광 실시.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-1 bg-blue-400 rounded-full"></div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white mb-2">습도 및 기류 제어</h4>
+                            <p class="text-slate-400 text-sm">야간 유동팬 24시간 가동(결로 방지). 습도 40% 이하 시 천창 위주 환기 및 통로 관수.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Nutrient Config -->
+            <div class="glass-morphism p-8 rounded-[2.5rem]">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-strawberry-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+                    수분 및 양액 관리 현황
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">공급 pH</span>
+                        <span class="text-xl font-bold">5.8 ~ 6.0</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">공급 EC</span>
+                        <span class="text-xl font-bold text-strawberry-400">0.7 ~ 0.9</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">회당 급액량</span>
+                        <span class="text-xl font-bold">300 ~ 400cc</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-2xl">
+                        <span class="text-xs text-slate-400 block mb-1">급액 간격</span>
+                        <span class="text-xl font-bold">1.5h ~ 2h</span>
+                    </div>
+                </div>
+                <div class="mt-6 p-4 rounded-2xl border border-strawberry-500/20 bg-strawberry-500/5">
+                    <p class="text-xs text-strawberry-200">
+                        * 봄철 증산량 증가에 따라 농도를 평소보다 낮게 조절하여 수분 스트레스를 최소화하고 있습니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Prices Table -->
+        <section class="space-y-6">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold font-display">도매시장 실시간 시세 및 예측</h2>
+                <p class="text-slate-400">데이터 기준: 2026-03-11 | 내일 가격 변동 예측 포함</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-8">
+                <!-- Market 1: Guri -->
+                <div class="glass-morphism rounded-[2rem] overflow-hidden">
+                    <div class="bg-white/5 px-8 py-4 border-b border-white/10 flex justify-between items-center">
+                        <h3 class="font-bold text-lg">구리 농수산물 도매시장 (소비지)</h3>
+                        <span class="status-badge bg-blue-500/20 text-blue-400">Premium Market</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-slate-400 text-sm uppercase tracking-wider">
+                                    <th class="px-8 py-4">법인명/품목</th>
+                                    <th class="px-8 py-4">등급</th>
+                                    <th class="px-8 py-4">오늘 현재가</th>
+                                    <th class="px-8 py-4">내일 예측가</th>
+                                    <th class="px-8 py-4">변동 요인</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-8 py-4 font-medium">구리농협 (1kg)</td>
+                                    <td class="px-8 py-4 text-strawberry-400 font-bold">특</td>
+                                    <td class="px-8 py-4">14,500원</td>
+                                    <td class="px-8 py-4 font-bold text-red-400">13,800원 ▼</td>
+                                    <td class="px-8 py-4 text-xs text-slate-400">물량 증가세 반영</td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-8 py-4 font-medium">구리농협 (2kg)</td>
+                                    <td class="px-8 py-4 text-strawberry-400 font-bold">특</td>
+                                    <td class="px-8 py-4">27,500원</td>
+                                    <td class="px-8 py-4 font-bold text-red-400">26,000원 ▼</td>
+                                    <td class="px-8 py-4 text-xs text-slate-400">대용량 수요 안정화</td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-8 py-4 font-medium">구리농협 (2kg)</td>
+                                    <td class="px-8 py-4 text-slate-300 font-bold">상</td>
+                                    <td class="px-8 py-4">19,000원</td>
+                                    <td class="px-8 py-4 font-bold text-slate-400">18,500원 -</td>
+                                    <td class="px-8 py-4 text-xs text-slate-400">보합세 유지</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Market 2: Suncheon -->
+                <div class="glass-morphism rounded-[2rem] overflow-hidden">
+                    <div class="bg-white/5 px-8 py-4 border-b border-white/10 flex justify-between items-center">
+                        <h3 class="font-bold text-lg">순천시 농산물 도매시장 (산지)</h3>
+                        <span class="status-badge bg-green-500/20 text-green-400">Production Base</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-slate-400 text-sm uppercase tracking-wider">
+                                    <th class="px-8 py-4">법인명/품목</th>
+                                    <th class="px-8 py-4">등급</th>
+                                    <th class="px-8 py-4">오늘 현재가</th>
+                                    <th class="px-8 py-4">내일 예측가</th>
+                                    <th class="px-8 py-4">변동 요인</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-8 py-4 font-medium">남일청과 (1kg)</td>
+                                    <td class="px-8 py-4 text-strawberry-400 font-bold">특</td>
+                                    <td class="px-8 py-4">9,500원</td>
+                                    <td class="px-8 py-4 font-bold text-red-400">9,000원 ▼</td>
+                                    <td class="px-8 py-4 text-xs text-slate-400">지역 공급량 확대</td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="px-8 py-4 font-medium">순천원예농협 (1kg)</td>
+                                    <td class="px-8 py-4 text-strawberry-400 font-bold">특</td>
+                                    <td class="px-8 py-4">9,800원</td>
+                                    <td class="px-8 py-4 font-bold text-red-400">9,300원 ▼</td>
+                                    <td class="px-8 py-4 text-xs text-slate-400">경매 물량 집중 예상</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Insight -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <div class="p-6 bg-slate-900/80 rounded-3xl border border-white/5">
+                    <h4 class="text-lg font-bold mb-3 text-strawberry-400">시황 요약</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        구리는 소비지로 고품질 물량 선호도가 매우 높으며 산지 대비 40~50% 프리미엄 가격을 형성하고 있습니다. 순천은 출하량이 안정화되며 보합세를 보이고 있습니다.
+                    </p>
+                </div>
+                <div class="p-6 bg-strawberry-900/20 rounded-3xl border border-strawberry-500/20">
+                    <h4 class="text-lg font-bold mb-3 text-white">내일 가격 예측 (3/12)</h4>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        전국적 출하량 증가로 인해 **약 3~5% 내외의 하락**이 전망됩니다. 산지인 순천은 물량 적체 방지를 위한 하향 조정 가능성이 큽니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety & Facilities -->
+        <section class="glass-morphism rounded-[2.5rem] p-8">
+            <h2 class="text-2xl font-bold mb-8 flex items-center gap-2">
+                <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                시설 및 안전 점검 현황
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white/5 p-6 rounded-2xl">
+                    <h4 class="font-bold text-white mb-2">건조 특보 대응</h4>
+                    <p class="text-slate-400 text-xs">보성 지역 강풍 예보에 따른 하우스 고정 밴드 인장 상태 최종 점검 완료.</p>
+                </div>
+                <div class="bg-white/5 p-6 rounded-2xl">
+                    <h4 class="font-bold text-white mb-2">화재 예방</h4>
+                    <p class="text-slate-400 text-xs">전기 분전반 및 난방 기구 주변 인화 물질 정리. 누전 차단기 정상 작동 확인.</p>
+                </div>
+                <div class="bg-white/5 p-6 rounded-2xl">
+                    <h4 class="font-bold text-white mb-2">병해충 예찰</h4>
+                    <p class="text-slate-400 text-xs">고온 건조 환경에서 발생하는 응애, 총채벌레 집중 정밀 점검 (잎 뒷면 및 꽃 내부).</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive Elements Scripts -->
+    <script>
+        // Simple scroll reveal for cards
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
+
